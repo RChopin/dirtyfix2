@@ -1,15 +1,17 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Cookie from "js-cookie";
 import axios from "axios";
 import config from "../config";
 
 export default function Home() {
 	const [verifier, setVerifier] = useState();
+	const [status, setStatus] = useState("Waiting for you");
 
 	const { query } = useRouter();
 	async function getToken() {
+		setStatus("Loading your token");
 		console.time("getToken");
 
 		await axios
@@ -18,8 +20,8 @@ export default function Home() {
 				verifier: verifier,
 			})
 			.then((res) => {
+				setStatus("Done! You can close this window now.");
 				console.timeEnd("getToken");
-				let data = res.data;
 				Cookie.set("token", res.data.access_token, {
 					expires: new Date(new Date().getTime() + res.data.expires_in * 1000),
 					path: "/",
@@ -78,6 +80,7 @@ export default function Home() {
 				>
 					Send
 				</button>
+				<h2>{status}</h2>
 			</main>
 		</div>
 	);
